@@ -96,17 +96,17 @@ pos_embed = tf.keras.layers.Embedding(bptt, embed_dim)(positions)
 input_embed = token_embed + pos_embed
 
 for i in range(attention_layer_count):
-    if i == 0:
-        attention = tf.keras.layers.MultiHeadAttention(num_heads=num_heads, key_dim=(embed_dim // num_heads))(input_embed, input_embed)
-    else:
-        attention = tf.keras.layers.MultiHeadAttention(num_heads=num_heads, key_dim=(embed_dim // num_heads))(ffn, ffn)
-    attention = tf.keras.layers.Dropout(dropout_rate)(attention)
-    attention = tf.keras.layers.LayerNormalization(epsilon=1e-6)(input_embed + attention)
+  if i == 0:
+    attention = tf.keras.layers.MultiHeadAttention(num_heads=num_heads, key_dim=(embed_dim // num_heads))(input_embed, input_embed)
+  else:
+    attention = tf.keras.layers.MultiHeadAttention(num_heads=num_heads, key_dim=(embed_dim // num_heads))(ffn, ffn)
+  attention = tf.keras.layers.Dropout(dropout_rate)(attention)
+  attention = tf.keras.layers.LayerNormalization(epsilon=1e-6)(input_embed + attention)
 
-    ffn = tf.keras.layers.Dense(ff_dim, activation='relu')(attention)
-    ffn = tf.keras.layers.Dense(embed_dim)(ffn)
-    ffn = tf.keras.layers.Dropout(dropout_rate)(ffn)
-    ffn = tf.keras.layers.LayerNormalization(epsilon=1e-6)(attention + ffn)
+  ffn = tf.keras.layers.Dense(ff_dim, activation='relu')(attention)
+  ffn = tf.keras.layers.Dense(embed_dim)(ffn)
+  ffn = tf.keras.layers.Dropout(dropout_rate)(ffn)
+  ffn = tf.keras.layers.LayerNormalization(epsilon=1e-6)(attention + ffn)
     
 output = tf.keras.layers.GlobalAveragePooling1D()(ffn)
 output = tf.keras.layers.Dropout(dropout_rate)(output)
